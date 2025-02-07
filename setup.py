@@ -4,7 +4,10 @@ setup(
     name='BoxUtils',
     version='0.1.0',
     packages=find_packages(),
-    install_requires=[],  # Add your dependencies here
+    install_requires=[
+        'python-dotenv',
+        'box_sdk_gen[jwt]',
+    ],
     entry_points={
 
     },
