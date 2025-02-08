@@ -5,3 +5,4 @@ dist/
 BoxUtils.egg-info/
 .jwt.env
 .jwt.config.json
+.ent.jwt.tk.db

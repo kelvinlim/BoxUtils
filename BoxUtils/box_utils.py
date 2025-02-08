@@ -37,11 +37,12 @@ from box_sdk_gen import ByteStream
 from box_sdk_gen.schemas import Folder, FolderMini, FileMini, WebLinkMini
 from box_sdk_gen.managers.folders import Items, CreateFolderParent
 
-__version_info__ = ('0', '1', '0')
+__version_info__ = ('0', '1', '3')
 __version__ = '.'.join(__version_info__)
 
 version_history = \
 """
+0.1.3 - cleaned up __init__ for BoxUtils class and test command
 0.1.0 - initial version  
 """
 
@@ -99,7 +100,7 @@ class ConfigJWT:
     
 class BoxUtils:
     
-    def __init__(self, **kwargs):
+    def __init__(self, env='.jwt.env', config='.jwt.config.json', **kwargs):
         
         # load self.config
         self.config = {}
@@ -118,9 +119,6 @@ class BoxUtils:
 
         self.client = self.setup_box_client()
         
-        # list a folder
-        folder_id = '306368557395' # BoxAPITest
-        self.test_cmd( args.cmd,folder_id=folder_id)
         pass
     
     def setup_box_client(self):
@@ -134,8 +132,51 @@ class BoxUtils:
         different test commands
         """
         if cmd == 'test':
+            # create a folder testfolder in the root folder
+            folder_name = 'testfolder'
+            results = self.create_folder('0', folder_name)
+            test_folder_id = results.id
+            
+            # create several local files
+            local_files = ['hello.txt', 'hello2.txt', 'hello3.txt']
+            for local_file in local_files:
+                with open(local_file, 'w') as f:
+                    f.write('hello')
+                    
+            # upload these files to the test folder
+            for local_file in local_files:
+                results = self.upload_file(local_file, test_folder_id)
+                
+            # download the last uploaded file into a new file
+            file_id = results.id
+            self.download_file(file_id, 'hello12345.txt')
+            
+            # delete a folder, should fail since there is a file in the folder
+            folder_id_delete = test_folder_id
+            results = self.delete_folder(folder_id_delete)
+            
+            # delete the files we uploaded so that we can delete the directory
+            if results == False:
+                # get the items in the folder
+                items = self.list_folder(test_folder_id)
+                # delete the files we uploaded
+                for item in items.entries:
+                    if item.type == 'file':
+                        self.delete_file(item.id)
+        
+            # now can delete folder since it is empty
+            folder_id_delete = test_folder_id
+            results = self.delete_folder(folder_id_delete)
+            
+            # clean up the local files we created
+            local_files.append('hello12345.txt')
+            for local_file in local_files:
+                os.remove(local_file)
+            
+        elif cmd == 'test2':
             # need the folder_id
-            folder_id = kwargs.get('folder_id', '0')
+            # folder_id = kwargs.get('folder_id', '0')
+            folder_id = '306368557395'
             items = self.list_folder(folder_id)
             print(f"\nFolder {folder_id} has {len(items.entries)} items")
             for item in items.entries:
@@ -155,6 +196,9 @@ class BoxUtils:
                         
             # upload a file
             local_path = 'hellotest.txt'
+            # create the file with text hello test
+            with open(local_path, 'w') as f:
+                f.write('hello test')
             results = self.upload_file(local_path, new_folder_id)
             new_file_id = results.id
             
@@ -169,7 +213,7 @@ class BoxUtils:
         
             # now can delete folder since it is empty
             folder_id_delete = new_folder_id
-            results = self.delete_folder(folder_id_delete)
+            results = self.delete_folder(folder_id_delete)            
             
         pass
     def list_folder(self, folder_id):
@@ -378,3 +422,6 @@ if __name__ == "__main__":
                         config=args.config,
                         env=args.env,
                     )
+    
+    if args.cmd == 'test':
+        obj.test_cmd(args.cmd)
