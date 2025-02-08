@@ -42,6 +42,11 @@ ENTERPRISE_ID = 686XXX
    }
    ```
 
+## Sample usage
+
+```markdown
+[My Python Script](sample_usage.py)
+```
 ## For package creation and publishing
 
 Be sure to update the setup.py with version information.
