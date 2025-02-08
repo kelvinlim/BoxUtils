@@ -44,9 +44,9 @@ ENTERPRISE_ID = 686XXX
 
 ## Sample usage
 
-```markdown
-[My Python Script](sample_usage.py)
-```
+You can find the full sample usage script in the [sample_usage.py](sample_usage.py) file.
+
+
 ## For package creation and publishing
 
 Be sure to update the setup.py with version information.
