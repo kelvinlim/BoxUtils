@@ -3,3 +3,5 @@
 build/
 dist/
 BoxUtils.egg-info/
+.jwt.env
+.jwt.config.json

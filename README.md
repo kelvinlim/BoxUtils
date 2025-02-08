@@ -41,3 +41,17 @@ ENTERPRISE_ID = 686XXX
      "enterpriseID": "686XXX"
    }
    ```
+
+## For package creation and publishing
+
+Be sure to update the setup.py with version information.
+
+```bash
+# create the dist
+python setup.py sdist bdist_wheel
+
+# upload the package
+# credentials for pypi.org are kept in ~/.pypirc
+twine upload dist/*
+
+```
