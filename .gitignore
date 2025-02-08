@@ -1,2 +1,5 @@
 .venv/
 .jwt
+build/
+dist/
+BoxUtils.egg-info/
