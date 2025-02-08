@@ -1,0 +1,13 @@
+# Sample app configuration file
+{
+  "boxAppSettings": {
+    "clientID": "1u3gto5in5gff7ve8031tx8x6kl8xxxx",
+    "clientSecret": "********************************",
+    "appAuth": {
+      "publicKeyID": "",
+      "privateKey": "",
+      "passphrase": ""
+    }
+  },
+  "enterpriseID": "686XXX"
+}
