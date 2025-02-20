@@ -16,16 +16,15 @@ The app configuration json file can be downloaded under the Configuration/App Se
 
 Two files are required for initialization of the class
 
-1. .jwt.env - contains information about the the path to the config json file, the JWT user id and the enterprise id
+1. box.env - contains information about  the JWT user id and the enterprise id
 
 ```
 A# JWT Settings
-JWT_CONFIG_PATH = .jwt.config.json
 JWT_USER_ID = 397515XXXX
 ENTERPRISE_ID = 686XXX
 ```
 
-2. .jwt.config.json - contains the JWT credentials. This is downloaded from the box dev console.
+2. box.config.json - contains the JWT credentials. This is downloaded from the box dev console.
    ```
    # Sample app configuration file
    {
