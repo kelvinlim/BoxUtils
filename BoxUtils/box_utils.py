@@ -416,8 +416,13 @@ if __name__ == "__main__":
     
     # provide a description of the program with format control
     description = textwrap.dedent('''\
-
-    Class for using the BoxAPI with box_sdk_gen and a service account.
+    Class for working with Box API using a service account.
+    
+    It requires two files
+    
+    box.env contains:
+    
+     
     ''')
     
     parser = argparse.ArgumentParser(
