@@ -18,11 +18,11 @@ Two files are required for initialization of the class
 
 1. box.env - contains information about  the JWT user id and the enterprise id
 
-```
-A# JWT Settings
-JWT_USER_ID = 397515XXXX
-ENTERPRISE_ID = 686XXX
-```
+  ```
+  # JWT Settings
+  JWT_USER_ID = 397515XXXX
+  ENTERPRISE_ID = 686XXX
+  ```
 
 2. box.config.json - contains the JWT credentials. This is downloaded from the box dev console.
    ```

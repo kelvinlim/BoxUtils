@@ -4,11 +4,12 @@ import os
 import argparse
 import textwrap
 
-__version_info__ = ('1', '0', '1')
+__version_info__ = ('1', '0', '2')
 __version__ = '.'.join(__version_info__)
 
 version_history = \
 """
+1.0.2 - removed extraneous cmd option
 1.0.1 - fixed bug in parent folder, pass arguments for env and config
 1.0.0 - initial version  
 """
@@ -92,15 +93,30 @@ if __name__ == "__main__":
     
     Exercise the BoxUtils API
     
-    This expects .jwt.env to contain
+    Requires two files.
     
+    box.env - contains the following settings    
     # JWT Settings
-    # JWT_CONFIG_PATH = .jwt.config.json
     JWT_USER_ID = 397xxx
     ENTERPRISE_ID = 686xxx
     
+    box.config.json - contains the following settings
+    downloaded from the Box developer console.
     
- 
+    # Sample app configuration file
+    {
+        "boxAppSettings": {
+        "clientID": "1u3gto5in5gff7ve8031tx8x6kl8xxxx",
+        "clientSecret": "********************************",
+        "appAuth": {
+            "publicKeyID": "",
+            "privateKey": "",
+            "passphrase": ""
+        }
+        },
+        "enterpriseID": "686XXX"
+    }
+    
     ''')
     
     parser = argparse.ArgumentParser(
@@ -117,10 +133,6 @@ if __name__ == "__main__":
     parser.add_argument("--config", type = str,
                      help="name of json config file in the current directory, default box.config.json",
                       default="box.config.json") 
-        
-    parser.add_argument("--cmd", type = str,
-                    help="cmd - [list, summarize], default list",
-                    default = 'list')
     
     parser.add_argument("-H", "--history", action="store_true", help="Show program history")
      

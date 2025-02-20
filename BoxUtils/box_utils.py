@@ -415,16 +415,8 @@ if __name__ == "__main__":
     
     # provide a description of the program with format control
     description = textwrap.dedent('''\
-    A description of the program goes here.
-    
-    Account information is read from a .env file which contains the 
-    APITOKEN, DATACENTER and DIRECTORYID.
-    
-    Here are some examples of using the command. Text following the $ is
-    the command that is entered at the command line in a terminal window.
-    
-    $ LNPIQualtrics
-    Without any arguments, the mailingLists are listed with their index. 
+
+    Class for using the BoxAPI with box_sdk_gen and a service account.
     ''')
     
     parser = argparse.ArgumentParser(
