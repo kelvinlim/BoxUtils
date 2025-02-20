@@ -421,8 +421,25 @@ if __name__ == "__main__":
     It requires two files
     
     box.env contains:
+    # JWT Settings
+    JWT_USER_ID = 397515XXXX
+    ENTERPRISE_ID = 686XXX
     
-     
+    box.config.json - contains the JWT credentials. This is downloaded from the box dev console.
+
+    # Sample app configuration file
+    {
+    "boxAppSettings": {
+        "clientID": "1u3gto5in5gff7ve8031tx8x6kl8xxxx",
+        "clientSecret": "********************************",
+        "appAuth": {
+        "publicKeyID": "",
+        "privateKey": "",
+        "passphrase": ""
+        }
+    },
+    "enterpriseID": "686XXX"
+    }
     ''')
     
     parser = argparse.ArgumentParser(
