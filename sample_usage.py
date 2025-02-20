@@ -4,11 +4,12 @@ import os
 import argparse
 import textwrap
 
-__version_info__ = ('1', '0', '0')
+__version_info__ = ('1', '0', '1')
 __version__ = '.'.join(__version_info__)
 
 version_history = \
 """
+1.0.1 - fixed bug in parent folder, pass arguments for env and config
 1.0.0 - initial version  
 """
 
@@ -18,7 +19,7 @@ Sample usage of the BoxUtils package
 """
 import BoxUtils
 
-def test_box_api(parent_folder:str ='0'):
+def test_box_api(env: str, config: str, parent_folder:str ='0'):
     
     """
     Exercise the BoxUtils API
@@ -29,12 +30,7 @@ def test_box_api(parent_folder:str ='0'):
     # Create a BoxUtils object
     # be sure that the .jwt.env and .jwt.config.json files 
     # are in the same directory as this script
-    box_utils = BoxUtils.BoxUtils()
-
-    # create a folder testfolder in the root folder
-    # can change the parent folder id to create the folder in a different folder
-    parent_folder = '0' # set to the root folder
-    parent_folder = '306368557395'
+    box_utils = BoxUtils.BoxUtils(env=env, config=config)
 
     folder_name = 'testfolder'
     results = box_utils.create_folder(parent_folder, folder_name)
@@ -96,6 +92,14 @@ if __name__ == "__main__":
     
     Exercise the BoxUtils API
     
+    This expects .jwt.env to contain
+    
+    # JWT Settings
+    # JWT_CONFIG_PATH = .jwt.config.json
+    JWT_USER_ID = 397xxx
+    ENTERPRISE_ID = 686xxx
+    
+    
  
     ''')
     
@@ -107,12 +111,12 @@ if __name__ == "__main__":
                       default="0") 
 
     parser.add_argument("--env", type = str,
-                     help="name of env file in the current directory, default .env",
-                      default=".env") 
+                     help="name of env file in the current directory, default box.env",
+                      default="box.env") 
 
     parser.add_argument("--config", type = str,
-                     help="name of json config file in the current directory, default config.json",
-                      default="config.json") 
+                     help="name of json config file in the current directory, default box.config.json",
+                      default="box.config.json") 
         
     parser.add_argument("--cmd", type = str,
                     help="cmd - [list, summarize], default list",
@@ -134,5 +138,5 @@ if __name__ == "__main__":
         exit(0)
         
     # call the test function
-    test_box_api(parent_folder=args.folder)
+    test_box_api(parent_folder=args.folder, env = args.env, config=args.config)
 

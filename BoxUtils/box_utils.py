@@ -43,10 +43,10 @@ __version__ = '.'.join(__version_info__)
 version_history = \
 """
 0.1.3 - cleaned up __init__ for BoxUtils class and test command
+    env file = box.env
+    config file = box.config.json
 0.1.0 - initial version  
 """
-
-ENV_JET = ".jwt.env"
 
 logging.basicConfig(level=logging.INFO)
 logging.getLogger("box_sdk_gen").setLevel(logging.CRITICAL)
@@ -56,11 +56,19 @@ logging.getLogger("box_sdk_gen").setLevel(logging.CRITICAL)
 class ConfigJWT:
     """application configurations"""
 
-    def __init__(self) -> None:
-        dotenv.load_dotenv(ENV_JET)
+    def __init__(self, env='.jwt.env', config='.jwt.config.json') -> None:
+        
+        """
+        env file contains
+        JWT_USER_ID = 397xxx
+        ENTERPRISE_ID = 686xxx
+        
+        .jwt.config.json - file downloaded from Box Developer console for your app
+        """
+        dotenv.load_dotenv(env)
 
         # JWT configurations
-        self.jwt_config_path = os.getenv("JWT_CONFIG_PATH")
+        self.jwt_config_path = config
         self.jwt_user_id = os.getenv("JWT_USER_ID")
         self.enterprise_id = os.getenv("ENTERPRISE_ID")
 
@@ -100,30 +108,30 @@ class ConfigJWT:
     
 class BoxUtils:
     
-    def __init__(self, env='.jwt.env', config='.jwt.config.json', **kwargs):
+    def __init__(self, env='box.env', config='box.config.json', **kwargs):
         
-        # load self.config
-        self.config = {}
-        for key, value in kwargs.items():
-            self.config[key] = value
+        # # load self.config
+        # self.config = {}
+        # for key, value in kwargs.items():
+        #     self.config[key] = value
 
-        # read in .env file
-        if 'env' in self.config:
-            self.config.update(dotenv_values(self.config['env']))
+        # # read in .env file
+        # if 'env' in self.config:
+        #     self.config.update(dotenv_values(self.config['env']))
         
-        if 'config' in self.config:
-            # Open and read the YAML file
-            with open(self.config['config'], 'r') as file:
-                data = json.load(file)
-                self.config.update(data)
+        # if 'config' in self.config:
+        #     # Open and read the YAML file
+        #     with open(self.config['config'], 'r') as file:
+        #         data = json.load(file)
+        #         self.config.update(data)
 
-        self.client = self.setup_box_client()
+        self.client = self.setup_box_client(env=env, config=config)
         
         pass
     
-    def setup_box_client(self):
+    def setup_box_client(self,env='',config=''):
         """setup the box client"""
-        config = ConfigJWT()
+        config = ConfigJWT(env=env, config=config)
         client = config.get_jwt_enterprise_client(config)
         return client   
     
@@ -368,6 +376,40 @@ class BoxUtils:
             print(f"Error getting file details: {e}")
             return None
 
+    def list_folder_recursively(self, folder_id, max_levels=None):
+        """
+        Lists items in a folder recursively, including all subfolders.
+
+        Args:
+            folder_id (str): The ID of the folder to list.
+            max_levels (int, optional): The maximum number of folder levels to descend.
+                                        Defaults to None, which means no limit.
+
+        Returns:
+            list: A list of dictionaries, each containing information about an item in the folder or its subfolders.
+                Each dictionary has the keys 'box_id', 'name', 'type', and 'level'.
+        """
+        all_items = []
+        
+        def _list_folder(folder_id, level=0):
+            """
+            Inner function to list items in a single folder and recursively call itself for subfolders.
+            """
+            if max_levels is not None and level >= max_levels:
+                return
+
+            try:
+                items = self.client.folders.get_folder_items(folder_id)
+                for item in items.entries:
+                    all_items.append({'box_id': item.id, 'name': item.name, 'type': item.type, 'level': level})
+                    if item.type == 'folder':
+                        _list_folder(item.id, level + 1)  # Recursive call for subfolders
+
+            except Exception as e:
+                print(f"Error listing folder: {e}")
+
+        _list_folder(folder_id)  # Start the recursive listing
+        return all_items
 
 if __name__ == "__main__":
     
@@ -389,12 +431,12 @@ if __name__ == "__main__":
         description=description, formatter_class=argparse.RawTextHelpFormatter)
 
     parser.add_argument("--env", type = str,
-                     help="name of env file in the current directory, default .jwt.env",
-                      default=".jwt.env") 
+                     help="name of env file in the current directory, default box.env",
+                      default="box.env") 
 
     parser.add_argument("--config", type = str,
-                     help="name of json config file in the current directory, default .jwt.config.json",
-                      default=".jwt.config.json") 
+                     help="name of json config file in the current directory, default box.config.json",
+                      default="box.config.json") 
         
     parser.add_argument("--cmd", type = str,
                     help="cmd -  default test",

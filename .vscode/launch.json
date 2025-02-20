@@ -15,6 +15,17 @@
                 "--cmd",
                 "test",
             ]
+        },
+        {
+            "name": "sample_usage.py test",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "sample_usage.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--config",
+                "box.config.json",
+            ]
         }
     ]
 }
