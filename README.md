@@ -52,7 +52,7 @@ Be sure to update the setup.py with version information.
 
 ```bash
 # create the dist
-python setup.py sdist bdist_wheel
+python -m build
 
 # upload the package
 # credentials for pypi.org are kept in ~/.pypirc
