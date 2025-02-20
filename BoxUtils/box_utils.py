@@ -37,11 +37,12 @@ from box_sdk_gen import ByteStream
 from box_sdk_gen.schemas import Folder, FolderMini, FileMini, WebLinkMini
 from box_sdk_gen.managers.folders import Items, CreateFolderParent
 
-__version_info__ = ('0', '1', '3')
+__version_info__ = ('0', '1', '6')
 __version__ = '.'.join(__version_info__)
 
 version_history = \
 """
+0.1.6 - added arguments
 0.1.3 - cleaned up __init__ for BoxUtils class and test command
     env file = box.env
     config file = box.config.json
