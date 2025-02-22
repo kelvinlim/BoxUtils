@@ -14,6 +14,7 @@
             "args": [
                 "--cmd",
                 "test",
+
             ]
         },
         {
@@ -25,6 +26,12 @@
             "args": [
                 "--config",
                 "box.config.json",
+                "--folder",
+                //"306368557395", // test folder
+                "125497368597", // data folder  
+                "--pattern",
+                //"*.txt",
+                "*.mp4"             
             ]
         }
     ]

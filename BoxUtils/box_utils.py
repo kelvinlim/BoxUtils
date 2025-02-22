@@ -10,6 +10,7 @@ import json
 from pathlib import Path
 import textwrap
 import shutil
+import fnmatch
 
 from dotenv import dotenv_values  # pip install python-dotenv
 import os
@@ -37,11 +38,12 @@ from box_sdk_gen import ByteStream
 from box_sdk_gen.schemas import Folder, FolderMini, FileMini, WebLinkMini
 from box_sdk_gen.managers.folders import Items, CreateFolderParent
 
-__version_info__ = ('0', '1', '6')
+__version_info__ = ('0', '1', '7')
 __version__ = '.'.join(__version_info__)
 
 version_history = \
 """
+0.1.7 - added recursive indexing of a folder
 0.1.6 - added arguments
 0.1.3 - cleaned up __init__ for BoxUtils class and test command
     env file = box.env
@@ -377,40 +379,89 @@ class BoxUtils:
             print(f"Error getting file details: {e}")
             return None
 
-    def list_folder_recursively(self, folder_id, max_levels=None):
+    def index_folder_recursively(self, folder_id, max_levels=None):
         """
-        Lists items in a folder recursively, including all subfolders.
+        Indexes items in a folder recursively, including all subfolders and stores the result in self.folder_contents.
+        Each item includes the full path of parent folders and their IDs.
 
         Args:
             folder_id (str): The ID of the folder to list.
             max_levels (int, optional): The maximum number of folder levels to descend.
-                                        Defaults to None, which means no limit.
+                                     Defaults to None, which means no limit.
 
         Returns:
             list: A list of dictionaries, each containing information about an item in the folder or its subfolders.
-                Each dictionary has the keys 'box_id', 'name', 'type', and 'level'.
+              Each dictionary has the keys 'box_id', 'name', 'type', 'level', 'parent_folder_name', and 'parent_folder_id'.
         """
         all_items = []
-        
-        def _list_folder(folder_id, level=0):
+
+        def _list_folder(folder_id, level=0, parent_folder_name=None, parent_folder_id=None):
             """
             Inner function to list items in a single folder and recursively call itself for subfolders.
             """
             if max_levels is not None and level >= max_levels:
                 return
 
+            if parent_folder_name is None:
+                parent_folder_name = [] # Initialize as an empty list
+            if parent_folder_id is None:
+                parent_folder_id =  []  # Initialize as an empty list
+
             try:
                 items = self.client.folders.get_folder_items(folder_id)
                 for item in items.entries:
-                    all_items.append({'box_id': item.id, 'name': item.name, 'type': item.type, 'level': level})
+                    all_items.append({
+                        'box_id': item.id,
+                        'name': item.name,
+                        'type': item.type,
+                        'level': level,
+                        'parent_folder_name': parent_folder_name.copy(),  # Store a copy of the list
+                        'parent_folder_id': parent_folder_id.copy()     # Store a copy of the list
+                    })
                     if item.type == 'folder':
-                        _list_folder(item.id, level + 1)  # Recursive call for subfolders
+                        parent_folder_name.append(item.name)
+                        parent_folder_id.append(item.id)
+                        _list_folder(item.id, level + 1, parent_folder_name, parent_folder_id)
+                        parent_folder_name.pop()  # Remove the last added folder
+                        parent_folder_id.pop()   # Remove the last added folder ID
 
             except Exception as e:
                 print(f"Error listing folder: {e}")
 
-        _list_folder(folder_id)  # Start the recursive listing
+        _list_folder(folder_id)
+        
+        # for each item in all_items add full_path for each item  
+        # for each item, it would string that combines the elements of parent_folder_name with name 
+        for item in all_items:
+            # create the path
+            full_path = os.path.join(*item['parent_folder_name'], item['name'])
+            item['full_path'] = full_path
+            pass
+        
+        self.folder_contents = all_items
         return all_items
+
+    def search_items(self, pattern, folder_id=None, max_levels=None):
+        """
+        Searches for items in the cached folder contents using a glob-like pattern.
+
+        Args:
+            pattern (str): A glob-like pattern to match against file and folder names.
+            folder_id (str, optional): If provided, only searches within this folder and its subfolders.
+            max_levels (int, optional): If provided, limits the search depth.
+
+        Returns:
+            list: A list of dictionaries representing the matched items.
+        """
+        if self.folder_contents is None or folder_id is not None:
+            self.list_folder_recursively(folder_id, max_levels)
+
+        matched_items = []
+        for item in self.folder_contents:
+            if fnmatch.fnmatch(item['full_path'], pattern):
+                matched_items.append(item)
+        return matched_items
+    
 
 if __name__ == "__main__":
     

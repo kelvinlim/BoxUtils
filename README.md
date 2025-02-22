@@ -25,21 +25,22 @@ Two files are required for initialization of the class
   ```
 
 2. box.config.json - contains the JWT credentials. This is downloaded from the box dev console.
-   ```
-   # Sample app configuration file
-   {
-     "boxAppSettings": {
-       "clientID": "1u3gto5in5gff7ve8031tx8x6kl8xxxx",
-       "clientSecret": "********************************",
-       "appAuth": {
-         "publicKeyID": "",
-         "privateKey": "",
-         "passphrase": ""
-       }
-     },
-     "enterpriseID": "686XXX"
-   }
-   ```
+
+  ```
+  # Sample app configuration file
+  {
+    "boxAppSettings": {
+      "clientID": "1u3gto5in5gff7ve8031tx8x6kl8xxxx",
+      "clientSecret": "********************************",
+      "appAuth": {
+        "publicKeyID": "",
+        "privateKey": "",
+        "passphrase": ""
+      }
+    },
+    "enterpriseID": "686XXX"
+  }
+  ```
 
 ## Sample usage
 
