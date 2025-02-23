@@ -21,7 +21,24 @@
             "name": "sample_usage.py test",
             "type": "debugpy",
             "request": "launch",
-            "program": "sample_usage.py",
+            "program": "BoxUtils/sample_usage.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--config",
+                "box.config.json",
+                "--folder",
+                "306368557395", // test folder
+                //"125497368597", // data folder  
+                "--pattern",
+                "*.txt",
+                //"*.mp4"             
+            ]
+        }       
+        {
+            "name": "sample_usage.py r61",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "BoxUtils/sample_usage.py",
             "console": "integratedTerminal",
             "args": [
                 "--config",

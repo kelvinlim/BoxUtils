@@ -21,7 +21,7 @@ version_history = \
 Sample usage of the BoxUtils package
 
 """
-import BoxUtils
+from box_utils import BoxUtils
 
 def test_box_api(env: str, config: str, pattern = "*.txt", parent_folder:str ='0'):
     
@@ -34,7 +34,7 @@ def test_box_api(env: str, config: str, pattern = "*.txt", parent_folder:str ='0
     # Create a BoxUtils object
     # be sure that the .jwt.env and .jwt.config.json files 
     # are in the same directory as this script
-    box_utils = BoxUtils.BoxUtils(env=env, config=config)
+    box_utils = BoxUtils(env=env, config=config)
 
     folder_name = 'mainfolder'
     results = box_utils.create_folder(parent_folder, folder_name)
