@@ -38,11 +38,12 @@ from box_sdk_gen import ByteStream
 from box_sdk_gen.schemas import Folder, FolderMini, FileMini, WebLinkMini
 from box_sdk_gen.managers.folders import Items, CreateFolderParent
 
-__version_info__ = ('0', '1', '7')
+__version_info__ = ('0', '1', '8')
 __version__ = '.'.join(__version_info__)
 
 version_history = \
 """
+0.1.8 - added 
 0.1.7 - added recursive indexing of a folder
 0.1.6 - added arguments
 0.1.3 - cleaned up __init__ for BoxUtils class and test command
@@ -227,18 +228,21 @@ class BoxUtils:
             results = self.delete_folder(folder_id_delete)            
             
         pass
-    def list_folder(self, folder_id):
+    def list_folder(self, folder_id, limit=1000, usemarker=False):
         """
         Lists items in a folder.
         
         Args:
             folder_id (str): The ID of the folder to list.
+            limit (int, optional): The maximum number of items to return.
+            usemarker (bool, optional): Whether to use marker-based pagination.
         
         https://github.com/box-community/box-python-gen-workshop/blob/main/workshops/files/files.md
         
+        TODO: implement pagination
         """
         try:
-            items = self.client.folders.get_folder_items(folder_id)
+            items = self.client.folders.get_folder_items(folder_id, limit=limit, usemarker=usemarker)
             return items
         except Exception as e:
             print(f"Error listing folder: {e}")
