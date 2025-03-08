@@ -1,5 +1,7 @@
+attrs==25.1.0
 backports.tarfile==1.2.0
 box-sdk-gen==1.11.0
+boxsdk==3.13.0
 build==1.2.2.post1
 certifi==2025.1.31
 cffi==1.17.1
@@ -23,6 +25,7 @@ pycparser==2.22
 Pygments==2.19.1
 PyJWT==2.10.1
 pyproject_hooks==1.2.0
+python-dateutil==2.9.0.post0
 python-dotenv==1.0.1
 q==2.7
 readme_renderer==44.0
@@ -31,6 +34,8 @@ requests-toolbelt==1.0.0
 rfc3986==2.0.0
 rich==13.9.4
 SecretStorage==3.3.3
+setuptools==75.8.0
+six==1.17.0
 twine==6.1.0
 urllib3==2.3.0
 zipp==3.21.0
