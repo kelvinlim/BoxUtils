@@ -38,12 +38,25 @@ from box_sdk_gen import ByteStream
 from box_sdk_gen.schemas import Folder, FolderMini, FileMini, WebLinkMini
 from box_sdk_gen.managers.folders import Items, CreateFolderParent
 
-__version_info__ = ('0', '1', '8')
+__version_info__ = ('0', '1', '9')
 __version__ = '.'.join(__version_info__)
 
 version_history = \
 """
-0.1.8 - added 
+0.1.9 - change result of list_folder to a list of items instead of box class
+        This was done to support pagination for folders with more than 1000 items, 
+        which is the limit fo the Box API. 
+
+        Example usage:
+        # get the items in the folder
+        items = box_utils.list_folder(test_folder_id)
+        # delete the files we uploaded
+        for item in items:
+            if item.type == 'file':
+                box_utils.delete_file(item.id)
+                print(f"Deleted file with name {item.name} and id {item.id}")
+
+0.1.8 - increased limit on list_folder to 1000
 0.1.7 - added recursive indexing of a folder
 0.1.6 - added arguments
 0.1.3 - cleaned up __init__ for BoxUtils class and test command
@@ -172,7 +185,7 @@ class BoxUtils:
                 # get the items in the folder
                 items = self.list_folder(test_folder_id)
                 # delete the files we uploaded
-                for item in items.entries:
+                for item in items:
                     if item.type == 'file':
                         self.delete_file(item.id)
         
@@ -190,8 +203,8 @@ class BoxUtils:
             # folder_id = kwargs.get('folder_id', '0')
             folder_id = '306368557395'
             items = self.list_folder(folder_id)
-            print(f"\nFolder {folder_id} has {len(items.entries)} items")
-            for item in items.entries:
+            print(f"\nFolder {folder_id} has {len(items)} items")
+            for item in items:
                 print(f"{item.name} [{item.id},{item.type}]")
 
             # get file details
@@ -228,7 +241,39 @@ class BoxUtils:
             results = self.delete_folder(folder_id_delete)            
             
         pass
-    def list_folder(self, folder_id, limit=1000, usemarker=False):
+
+    def list_folder(self, folder_id:str, limit:int = 1000) -> list:
+        """
+        Retrieves all items from a folder using marker-based pagination.
+
+        Args:
+            folder_id: The ID of the folder to retrieve items from.
+            limit: The maximum number of items to retrieve per request.
+
+        Returns:
+            An interable list of all items in the folder.
+        """
+        # get the total number of items in the folder
+        total_count = self.client.folders.get_folder_items(folder_id=folder_id, limit=1).total_count
+        items = []
+        marker = None  # initialize marker to None
+
+        # loop through the items in the folder using marker-based pagination
+        while True:
+            folder_items = self.client.folders.get_folder_items(
+                folder_id=folder_id,
+                usemarker=True,
+                marker=marker,
+                limit=limit # You can adjust the limit as needed, up to 1000
+            )
+            # add the items to the list
+            items.extend(folder_items.entries)
+            marker = folder_items.next_marker
+            if not marker:
+                break
+        return items
+
+    def list_folder_v1(self, folder_id, limit=1000, usemarker=False):
         """
         Lists items in a folder.
         
@@ -413,7 +458,7 @@ class BoxUtils:
 
             try:
                 items = self.client.folders.get_folder_items(folder_id)
-                for item in items.entries:
+                for item in items:
                     all_items.append({
                         'box_id': item.id,
                         'name': item.name,

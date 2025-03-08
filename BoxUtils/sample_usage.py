@@ -7,11 +7,25 @@ from pprint import pprint
 import json
 from datetime import datetime
 
-__version_info__ = ('1', '0', '2')
+__version_info__ = ('1', '0', '3')
 __version__ = '.'.join(__version_info__)
 
 version_history = \
 """
+1.0.3 - change result of list_folder to a list of items instead of box class
+        This was done to support pagination for folders with more than 1000 items, 
+        which is the limit fo the Box API. 
+
+        Example usage:
+        # get the items in the folder
+        items = box_utils.list_folder(test_folder_id)
+        # delete the files we uploaded
+        for item in items:
+            if item.type == 'file':
+                box_utils.delete_file(item.id)
+                print(f"Deleted file with name {item.name} and id {item.id}")
+
+
 1.0.2 - removed extraneous cmd option
 1.0.1 - fixed bug in parent folder, pass arguments for env and config
 1.0.0 - initial version  
@@ -105,7 +119,7 @@ def test_box_api(env: str, config: str, pattern = "*.txt", parent_folder:str ='0
         # get the items in the folder
         items = box_utils.list_folder(test_folder_id)
         # delete the files we uploaded
-        for item in items.entries:
+        for item in items:
             if item.type == 'file':
                 box_utils.delete_file(item.id)
                 print(f"Deleted file with name {item.name} and id {item.id}")
