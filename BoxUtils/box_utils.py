@@ -47,11 +47,15 @@ version_history = \
         This was done to support pagination for folders with more than 1000 items, 
         which is the limit fo the Box API. 
 
+        This introduces a breaking change in the API. The list_folder method 
+        now returns a list of items instead of a box class. Instead of using the box class,
+        you  now use the list of items to access the properties of the items in the folder.
+
         Example usage:
         # get the items in the folder
         items = box_utils.list_folder(test_folder_id)
         # delete the files we uploaded
-        for item in items:
+        for item in items:   # use items instead of items.entries
             if item.type == 'file':
                 box_utils.delete_file(item.id)
                 print(f"Deleted file with name {item.name} and id {item.id}")
