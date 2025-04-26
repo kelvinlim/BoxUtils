@@ -38,11 +38,16 @@ from box_sdk_gen import ByteStream
 from box_sdk_gen.schemas import Folder, FolderMini, FileMini, WebLinkMini
 from box_sdk_gen.managers.folders import Items, CreateFolderParent
 
-__version_info__ = ('0', '1', '9')
+__version_info__ = ('0', '1', '10')
 __version__ = '.'.join(__version_info__)
 
 version_history = \
 """
+0.1.10 - was getting an error in folder.get_items that not iterable
+        This was due to the fact that the list_folder method was returning a box class
+        instead of a list of items. This was fixed by checking the type of items
+        and if it is not a list, then we use the entries attribute to get the list of items. 
+
 0.1.9 - change result of list_folder to a list of items instead of box class
         This was done to support pagination for folders with more than 1000 items, 
         which is the limit fo the Box API. 
@@ -462,6 +467,13 @@ class BoxUtils:
 
             try:
                 items = self.client.folders.get_folder_items(folder_id)
+
+                # check if items is a list 
+                if type(items) != list:
+                    # if items is not a list, then it is a box class
+                    # pass it attribute that returns a list
+                    items = items.entries
+
                 for item in items:
                     all_items.append({
                         'box_id': item.id,
