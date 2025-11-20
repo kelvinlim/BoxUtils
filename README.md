@@ -46,6 +46,15 @@ Two files are required for initialization of the class
 
 You can find the full sample usage script in the [sample_usage.py](sample_usage.py) file.
 
+Note you may need to customize the folder ids for 
+your account.
+
+To run the sample usage script, use the following command:
+
+```bash
+source .venv/bin/activate
+python BoxUtils/sample_usage.py
+```
 
 ## For package creation and publishing
 

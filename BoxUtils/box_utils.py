@@ -38,11 +38,12 @@ from box_sdk_gen import ByteStream
 from box_sdk_gen.schemas import Folder, FolderMini, FileMini, WebLinkMini
 from box_sdk_gen.managers.folders import Items, CreateFolderParent
 
-__version_info__ = ('0', '1', '10')
+__version_info__ = ('0', '1', '11')
 __version__ = '.'.join(__version_info__)
 
 version_history = \
 """
+0.1.11 - Used Antigravity to find bug in search_items
 0.1.10 - was getting an error in folder.get_items that not iterable
         This was due to the fact that the list_folder method was returning a box class
         instead of a list of items. This was fixed by checking the type of items
@@ -161,95 +162,7 @@ class BoxUtils:
         client = config.get_jwt_enterprise_client(config)
         return client   
     
-    def test_cmd(self, cmd: str, **kwargs):
-        """
-        different test commands
-        """
-        if cmd == 'test':
-            # create a folder testfolder in the root folder
-            folder_name = 'testfolder'
-            results = self.create_folder('0', folder_name)
-            test_folder_id = results.id
-            
-            # create several local files
-            local_files = ['hello.txt', 'hello2.txt', 'hello3.txt']
-            for local_file in local_files:
-                with open(local_file, 'w') as f:
-                    f.write('hello')
-                    
-            # upload these files to the test folder
-            for local_file in local_files:
-                results = self.upload_file(local_file, test_folder_id)
-                
-            # download the last uploaded file into a new file
-            file_id = results.id
-            self.download_file(file_id, 'hello12345.txt')
-            
-            # delete a folder, should fail since there is a file in the folder
-            folder_id_delete = test_folder_id
-            results = self.delete_folder(folder_id_delete)
-            
-            # delete the files we uploaded so that we can delete the directory
-            if results == False:
-                # get the items in the folder
-                items = self.list_folder(test_folder_id)
-                # delete the files we uploaded
-                for item in items:
-                    if item.type == 'file':
-                        self.delete_file(item.id)
-        
-            # now can delete folder since it is empty
-            folder_id_delete = test_folder_id
-            results = self.delete_folder(folder_id_delete)
-            
-            # clean up the local files we created
-            local_files.append('hello12345.txt')
-            for local_file in local_files:
-                os.remove(local_file)
-            
-        elif cmd == 'test2':
-            # need the folder_id
-            # folder_id = kwargs.get('folder_id', '0')
-            folder_id = '306368557395'
-            items = self.list_folder(folder_id)
-            print(f"\nFolder {folder_id} has {len(items)} items")
-            for item in items:
-                print(f"{item.name} [{item.id},{item.type}]")
 
-            # get file details
-            file_id = '1771382171648' # hello.txt
-            file_info = self.get_file_details(file_id)
-            
-            # download a file
-            self.download_file(file_id, 'hello12345.txt')
-            
-            # create a folder
-            folder_name = 'testfolder'
-            results = self.create_folder(folder_id, folder_name)
-            new_folder_id = results.id
-                        
-            # upload a file
-            local_path = 'hellotest.txt'
-            # create the file with text hello test
-            with open(local_path, 'w') as f:
-                f.write('hello test')
-            results = self.upload_file(local_path, new_folder_id)
-            new_file_id = results.id
-            
-            # delete a folder, should fail since there is a file in the folder
-            folder_id_delete = new_folder_id
-            results = self.delete_folder(folder_id_delete)
-            
-            # delete the file we uploaded
-            file_id_delete = new_file_id
-            self.delete_file(file_id_delete)
-            pass
-        
-            # now can delete folder since it is empty
-            folder_id_delete = new_folder_id
-            results = self.delete_folder(folder_id_delete)            
-            
-        pass
 
     def list_folder(self, folder_id:str, limit:int = 1000) -> list:
         """
@@ -519,7 +432,7 @@ class BoxUtils:
             list: A list of dictionaries representing the matched items.
         """
         if self.folder_contents is None or folder_id is not None:
-            self.list_folder_recursively(folder_id, max_levels)
+            self.index_folder_recursively(folder_id, max_levels)
 
         matched_items = []
         for item in self.folder_contents:
@@ -595,6 +508,3 @@ if __name__ == "__main__":
                         config=args.config,
                         env=args.env,
                     )
-    
-    if args.cmd == 'test':
-        obj.test_cmd(args.cmd)

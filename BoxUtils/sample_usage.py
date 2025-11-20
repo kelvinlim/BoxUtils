@@ -88,9 +88,10 @@ def test_box_api(env: str, config: str, pattern = "*.txt", parent_folder:str ='0
         uploaded_file_id = results.id
         pass
 
-    print(f"Recursively index folder {parent_folder}")
+    max_levels=2
+    print(f"Recursively index folder {parent_folder} with max_levels of recursion {max_levels}")
     start_time = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}"
-    folder_contents = box_utils.index_folder_recursively(parent_folder)
+    folder_contents = box_utils.index_folder_recursively(parent_folder, max_levels=max_levels)
     end_time = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}"
 
     # get list of the files that contain pattern
